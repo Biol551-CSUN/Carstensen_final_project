@@ -215,8 +215,6 @@ plot <- sankeyNetwork(Links = odr3_data, #Making a Sankey plot
                    colourScale = my_color, #Setting custom color scale
                    fontSize = 12)  #Increasing the font size
 
-plot
-
 saveWidget(plot, file=paste0( getwd(), "/HtmlWidget/sankey.html"))  #Saving the html widget
 
 webshot(here("HtmlWidget", "sankey.html"), "sankey.png")  #Taking a screenshot of the html widget and saving as a .png
