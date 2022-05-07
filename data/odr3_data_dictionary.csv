@@ -1,0 +1,4 @@
+﻿name,plot_name,description
+source,source,"Name of the source node for that section of the Sankey diagram flow. Using the final names I would like on the plot, because the networkD3 package to generate the Sankey plot will not allow me to edit the label names later. "
+target,target,"Name of the target node for that section of the Sankey diagram flow. Using the final names I would like on the plot, because the networkD3 package to generate the Sankey plot will not allow me to edit the label names later. "
+value,value,"Number of worms, indicating how wide that part of the Sankey diagram flow should be. "

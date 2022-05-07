@@ -1,0 +1,8 @@
+﻿source,target,value
+Worms injected (54),Successful (11),52
+Successful (11),RFP+ F1s (28),11
+RFP+ F1s (28),Heterozygous F1s (17),28
+RFP+ F1s (28),Wild-type F1s (11),17
+Heterozygous F1s (17),Homozygous F2s (11),10
+Homozygous F2s (11),Early stop (6),6
+Homozygous F2s (11),Start codon deleted (4),4

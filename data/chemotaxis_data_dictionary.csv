@@ -1,0 +1,7 @@
+name,plot_name,description
+sample_id,Sample,Replicate plate sample number
+lifestage,Life Stage,Stage of the worms - dauer or adult
+genotype,Genotype,"Genotype of the worms - PS312 is the wild-type strain, csu60 is a Daf-c (dauer) mutant"
+treatment,Treatment,"Treatment the worms were given prior to chemotaxis experiment - none (no treatment), transgene (rescue transgene with wild-type copy of hsd-2 gene), no_transgene, 7DA (delta-7-dafachronic acid), or no_7DA"
+attracted,Attracted,Number of worms on attractant side of the assay plate. Attractant is 5% ZTDO in ethanol. 
+control,Control,Number of worms on the control/counterattractant side of the plate. Control is ethanol. 

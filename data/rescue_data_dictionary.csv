@@ -1,0 +1,7 @@
+name,plot_name,description
+sample_id,Sample,Replicate plate sample number
+genotype,Genotype,"Genotype of the worms - PS312 is the wild-type strain, csu60 is a Daf-c (dauer) mutant, csuEx54 is csu60 with a rescue transgene for hsd-2"
+treatment,Treatment,Treatment the worms were given for rescue assay. 
+days_inc,Days,Days the worms were grown on the plates before scoring for stage
+dauer,Dauer,Number of dauers counted on the plate
+non_dauer,Non-Dauer,Number of non-dauers counted on the plate
