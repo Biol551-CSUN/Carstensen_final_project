@@ -1,0 +1,237 @@
+---
+title: "Biol551 Final Project - Pristionchus pacificus Ppa-hsd-2 constitutive dauer mutant and Ppa-odr-3 mutagenesis"
+author: "Heather Carstensen"
+date: "5/6/2022"
+runtime: shiny
+output:
+  prettydoc::html_pretty:
+    toc: TRUE
+    theme: spacelab
+---
+
+```{r setup, message=FALSE, warning=FALSE, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+#### Loading Libraries ####
+
+library(tidyverse)
+library(here)
+library(shiny)
+library(networkD3)
+library(htmlwidgets)
+library(webshot)
+library(magick)
+```
+
+
+## *Pristionchus pacificus* life cycle
+
+*Pristionchus pacificus* is a free-living, microscopic nematode (roundworm) that also associates with a specific species of beetle, *Exomala orientalis*.
+
+When environmental conditions are favorable, *P. pacificus* continuously develop through the embryonic stage and four larval stages before reaching reproductive adulthood, a process that takes about three days.
+
+When environmental conditions are unfavorable, including lack of food, high population density, and high temperature, young larvae instead have the option of entering an alternate stress-resistant larval stage called dauer. This stage does not eat and will remain developmentally arrested until the dauer encounters favorable conditions such as food, triggering resumption of development. The dauer stage is also considered to be the host-seeking stage. 
+
+```{r}
+image_read(here("Images", "lifecycle.png"))  #Read in life cycle image
+```
+
+## Is the *csu60* constitutive dauer mutant an allele of the *Ppa-hsd-2* gene?
+
+To understand what genes regulate the dauer stage, researchers often examine mutants that exhibit dauer-related phenotypes. One such phenotype is constitutive dauer formation, Daf-c, wherein the mutant worms inappropriately enter the dauer stage even with sufficient food. 
+
+We learned from whole genome sequencing that a constitutive dauer allele, *csu60*, has a deletion that includes the gene *Ppa-hsd-2*. This gene is an enzyme that makes delta-7-dafachronic acid (7DA), a hormone that normally suppresses dauer formation. 
+
+To address whether deletion of *Ppa-hsd-2* is causing the *csu60* dauer phenotype, we examined whether:
+ * Exposure to exogenous 7DA hormone
+ * A wild-type *Ppa-hsd-2* transgene
+can prevent the inappropriate dauer formation in *csu60*. 
+
+First, I will read in the related data and process it. 
+
+```{r}
+rescue_data <- read_csv(here("data", "rescue.csv")) #Read in the data
+
+#### Formatting rescue data to calculate dauer and non-dauer population percentages.
+
+rescue_data <- rescue_data %>%  #Working with the rescue data
+  mutate(total = dauer+non_dauer,  #Making a new column with total number of worms scored
+         percent_dauer = (dauer/total)*100,  #Making a new column with percent dauer scored
+         percent_non_dauer = (non_dauer/total)*100)  #Making a new column with percent non-dauer scored
+
+#### Creating a summary dataframe of the mean dauer and non-dauer population percentages, and formatting for easy plotting.
+
+rescue_summary <- rescue_data %>%   #Making a new summary data frame
+  group_by(genotype, treatment) %>%   #Grouping by genotype and treatment
+  summarise_at(c("percent_dauer", "percent_non_dauer"), mean) %>%   #Generating mean for the two percentage columns
+  unite("condition", genotype:treatment)%>%   #Uniting the genotype and treatment columns into a single column called condition
+  pivot_longer(cols = percent_dauer:percent_non_dauer,  #Pivoting longer
+               names_to = "Variables",   #Making column of original column names called Variables
+               values_to = "Values") %>%   #Making column of original values called Values
+  mutate(condition = factor(condition,   #Changing the factors of the condition column
+                            levels = c("csu60_none", "csuEx54_none", 
+                                       "csu60_EtOH", "csu60_7DA")))  #Designating the order of the levels for the condition column
+
+color_palette <- c("#97D2ED", "#215382")  #Creating a custom color palette
+
+#### Writing a function to easily generate plots from the summary dataframe
+
+rescue_plot <- function(data, x, y){
+  ggplot(data, aes(x = {{x}},
+                   y = {{y}},
+                   fill = Variables)) +
+    geom_col(color = "black") +
+    theme_linedraw() +
+    labs(x = " ",
+         y = "Percent of population") +
+    scale_fill_manual(values = color_palette,
+                      name = "Stage",
+                      labels = c("Dauers", "Non-dauers"))
+}
+
+
+```
+
+Next, I will plot the data to show whether feeding *csu60* mutants the exogenous 7DA hormone would rescue the Daf-c phenotype, showing that lack of the 7DA hormone is causing dauer formation.
+
+```{r}
+rescue_summary %>% 
+  filter(condition %in% c("csu60_EtOH", "csu60_7DA")) %>% 
+  rescue_plot(x = condition, y = Values) +
+  labs(title = "Delta-7-dafachronic acid (7DA) rescues \ncsu60 constitutive dauer formation") +
+  scale_x_discrete(name = " ", labels = c("csu60", "csu60 + 7DA"))
+
+ggsave(here("outputs", "csu60_7DA.png"),  #Saving output
+       width = 5, height = 7)  #Specifying width and height
+```
+
+As expected, exogenous 7DA did rescue the constitutive dauer formation. 
+
+Next, I will plot the data showing whether introducing a wild-type copy of the *Ppa-hsd-2* gene will also reduce the inappropriate dauer formation.
+
+```{r}
+rescue_summary %>% 
+  filter(condition %in% c("csu60_none", "csuEx54_none")) %>% 
+  rescue_plot(x = condition, y = Values) +
+  labs(title = "Ppa-hsd-2 rescue vector inhibits \ncsu60 constitutive dauer formation") +
+  scale_x_discrete(name = " ", labels = c("csu60", "csu60 + Ppa-hsd-2"))
+
+ggsave(here("outputs", "csu60_transgene.png"),  #Saving output
+       width = 5, height = 7)  #Specifying width and height
+```
+
+As expected, the *Ppa-hsd-2* gene also rescued the dauer formation, verifying that the *csu60* Daf-c phenotype is caused by deletion of the *Ppa-hsd-2* gene. 
+
+## Does the *Ppa-hsd-2* show phenotypes related to host-seeking odortaxis?
+
+Because dauer larvae are the host-seeking stage, they are attracted to a pheromone, Z-7-tetradece-2-one (ZTDO), which is produced by their host beetle species. 
+
+We examined *csu60* adult and dauer respones to ZTDO to see whether this mutation alters their host-seeking behavior. To do so, we utilized a chemotaxis assay, where an attractant (ZTDO in this case) and a control are pipetted on opposite sides of a plate, and worms responses to the attractant are calculated based on the proportion of worms counted near the attractant or the control. 
+
+```{r}
+image_read(here("Images", "ctx_template.png"))  #Read in chemotaxis template image
+```
+
+A chemotaxis index near 1 means high attraction, an index near -1 means high repulsion, and an index near 0 means a neutral response. Let's read in the raw chemotaxis data, use it to calculate the chemotaxis index ((A-C)/(A+C)), and examine the *csu60* response to the beetle pheromone ZTDO. 
+
+```{r}
+chemotaxis_data <- read_csv(here("data", "chemotaxis.csv"))  #Read in chemotaxis data
+
+chemotaxis_data <- chemotaxis_data %>%  #Overwrite changes to data frame
+  mutate(total = attracted+control,  #Make a new column with calculated total number of worms scored
+         CI = ((attracted-control)/total)) %>%  #Make column calculating the chemotaxis index
+  unite("condition", lifestage:treatment,  #Merging the column values for lifestage, genotype, and treatment
+        remove = FALSE) %>%  #Keeping the original columns
+  mutate(condition = factor(condition,  #Changing the factors for the condition column
+                            levels = c('adult_PS312_none', 'dauer_PS312_none', 
+                                       'adult_csu60_none', 'dauer_csu60_none',
+                                       'adult_csu60_no_7DA', 'adult_csu60_7DA',
+                                       'adult_csu60_no_transgene', 'adult_csu60_transgene')))  %>%  #Designating these factor levels
+  group_by(condition)  #Grouping by condition
+
+color_palette2 <- c("#AFCBFF", "#FAEEC0")  #Making a custom color palette
+
+chemotaxis_data %>%   #Start with chemotaxis data frame
+  filter(treatment == "none") %>% 
+  ggplot(aes(x = condition,  #Start ggplot with x mapped to condition
+             y = CI,  #Map y to chemotaxis index
+             fill = lifestage)) +  #Map fill to life stage
+  geom_violin(draw_quantiles = c(0.25, 0.5, 0.75)) +  #Start violin geometry, and draw lines for quantiles
+  geom_point() +  #Overlay point geometry for each replicate
+  theme_linedraw() +  #Use ggtheme linedraw
+  theme(axis.text.x = element_text(angle = 70, hjust = 1)) +  #Angle the text for the x-axis labels
+  scale_fill_manual(values = color_palette2, #Use custom color palette
+                    name = "Stage", #Change the legend title
+                    labels = c("Adult", "Dauer")) +  #Change the legend labels
+  scale_x_discrete(name = " ",  #Remove x-axis title
+                   labels = c("PS312", "PS312", "csu60", "csu60")) + #Change all the labels under the x-axis
+  scale_y_continuous(name = "Chemotaxis Index",  #Change y-axis title
+                     n.breaks = 10) +  #Change number of y-axis major breaks to 10
+  geom_hline(yintercept = 0) +  #Add a horizontal, y-intercept line at y = 0
+  labs(title = "csu60 enhanced adult attraction to ZTDO requires \nPpa-hsd-2 but not delta-7-dafachronic acid (7DA)") #Add a plot title
+
+ggsave(here("outputs", "chemotaxis.png"),  #Save the plot
+       width = 7, height = 5)  #Specify the width and height
+```
+
+The wild-type strain PS312 responses to ZTDO look as expected - mild attraction to ZTDO in the adult stage, and higher attraction in the dauer stage. Interestingly, the *csu60* mutant adults show elevated attraction to ZTDO that resembles dauer-like attraction.
+
+## Does the *Ppa-hsd-2* mutation change *Ppa-odr-3p::rfp* neuronal expression?
+
+Interestingly, we found that the *Ppa-hsd-2* mutant ectopically expresses a transgenic fluorescent reporter for the gene *Ppa-odr-3* in an extra pair of neurons, compared to just two pairs of neurons in wild type (PS312). 
+
+```{r echo=FALSE}
+knitr::include_app(" https://h-carstensen.shinyapps.io/odr3_slider/",
+  height = "600px") #Calling the shiny app from shinyapps.io
+
+```
+
+
+Click [here]() to view the code used to make this shiny app. 
+
+
+In *C. elegans*, the *odr-3* gene is involved in response to volatile odors, so this extra expression in *csu60* may be related to the ZTDO chemotaxis phenotype. 
+
+## Is *Ppa-odr-3* related to the elevated adult chemotaxis to ZTDO in the *Ppa-hsd-2* mutant?
+
+To determine whether the *csu60* ectopic *Ppa-odr-3* expression is related to the elevated adult attraction to ZTDO observed in *csu60*, I generated *Ppa-odr-3* mutants using the CRISPR-Cas9 mutagenesis. This involves injecting adult worms with Cas9, the necessary RNA molecules, and a co-injection marker that will express RFP in successfully injected worms. I will make a Sankey diagram illustrating the efficiency of my mutagenesis screen. 
+
+```{r}
+odr3_data <- read_csv(here("data", "odr3_data.csv"))  #Read in data
+
+#Need to create a data frame with all the nodes that will be used in the Sankey plot.
+nodes <- data.frame(  #Start data frame called nodes
+  name=c(as.character(odr3_data$source),  #take source node names from odr3_data
+         as.character(odr3_data$target)) %>% unique()  #take target node names from odr3_data
+)
+
+# To make a Sankey plot with networkD3, connections between the nodes must be provided using ID rather than the real name, so they need to be reformatted.
+odr3_data$IDsource <- match(odr3_data$source, nodes$name)-1  #Reformat source nodes
+odr3_data$IDtarget <- match(odr3_data$target, nodes$name)-1  #Reformat target nodes
+
+my_color <- 'd3.scaleOrdinal() .domain(["Worms injected", "Successful","RFP+ F1s", "Heterozygous F1s", "Wild-type F1s", "Homozygous F2s", "Early stop", "Start codon deleted"]) .range(["#1D5C5D", "#5989C5" , "#A31000", "#69306D", "#8CC084", "#B85156", "EFD56B", "A7FFF6"])'  #Setting custom colors for each node
+
+# Make the Network
+plot <- sankeyNetwork(Links = odr3_data, #Making a Sankey plot
+                      Nodes = nodes,  #setting node values
+                   Source = "IDsource",  #Setting source values
+                   Target = "IDtarget",  #Setting target values
+                   Value = "value",  #Setting flow width values
+                   NodeID = "name",  #Setting node names
+                   sinksRight=FALSE,  #Making it so that nodes are not on the right border of the plot
+                   colourScale = my_color, #Setting custom color scale
+                   fontSize = 12)  #Increasing the font size
+
+saveWidget(plot, file=paste0( getwd(), "/HtmlWidget/sankey.html"))  #Saving the html widget
+
+webshot(here("HtmlWidget", "sankey.html"), "sankey.png")  #Taking a screenshot of the html widget and saving as a .png
+
+```
+
+Several mutant alleles were generated using CRISPR-Cas9 mutagenesis. The next steps would be to generate a double mutant of *Ppa-hsd-2* and *Ppa-odr-3*, and then test *Ppa-odr-3* mutants and *Ppa-odr-3*;*Ppa-hsd-2* double mutants for ZTDO chemotaxis, to examine whether *Ppa-odr-3* changes the enhanced adult attraction to ZTDO. 
+
+
+
+
