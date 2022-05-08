@@ -75,17 +75,17 @@ color_palette <- c("#97D2ED", "#215382")  #Creating a custom color palette
 
 #### Writing a function to easily generate plots from the summary dataframe
 
-rescue_plot <- function(data, x, y){
-  ggplot(data, aes(x = {{x}},
-                   y = {{y}},
-                   fill = Variables)) +
-    geom_col(color = "black") +
-    theme_linedraw() +
-    labs(x = " ",
-         y = "Percent of population") +
-    scale_fill_manual(values = color_palette,
-                      name = "Stage",
-                      labels = c("Dauers", "Non-dauers"))
+rescue_plot <- function(data, x, y){  #Creating a function called rescue_plot
+  ggplot(data, aes(x = {{x}},  #Starting ggplot, data, and aesthetics mapping
+                   y = {{y}},  #Aesthetics mapping
+                   fill = Variables)) +  #Mapping fill to Variables
+    geom_col(color = "black") +  #Column geometry with black outlines on the bars
+    theme_linedraw() +  #ggplot theme linedraw
+    labs(x = " ",  #Remove x-axis title
+         y = "Percent of population") +  #Set y-axis title
+    scale_fill_manual(values = color_palette,  #Use custom color palette
+                      name = "Stage",  #Set legend title
+                      labels = c("Dauers", "Non-dauers"))  #Set legend labels
 }
 
 
@@ -94,11 +94,11 @@ rescue_plot <- function(data, x, y){
 Next, I will plot the data to show whether feeding *csu60* mutants the exogenous 7DA hormone would rescue the Daf-c phenotype, showing that lack of the 7DA hormone is causing dauer formation.
 
 ```{r}
-rescue_summary %>% 
-  filter(condition %in% c("csu60_EtOH", "csu60_7DA")) %>% 
-  rescue_plot(x = condition, y = Values) +
-  labs(title = "Delta-7-dafachronic acid (7DA) rescues \ncsu60 constitutive dauer formation") +
-  scale_x_discrete(name = " ", labels = c("csu60", "csu60 + 7DA"))
+rescue_summary %>%   #Start working with rescue_summary data frame
+  filter(condition %in% c("csu60_EtOH", "csu60_7DA")) %>%  #Filter to control ethanol or 7DA-treated
+  rescue_plot(x = condition, y = Values) +  #Start rescue_plot function with x mapped to condition and y mapped to Values
+  labs(title = "Delta-7-dafachronic acid (7DA) rescues \ncsu60 constitutive dauer formation") +  #Add plot title
+  scale_x_discrete(labels = c("csu60", "csu60 + 7DA")) #Change x-axis labels
 
 ggsave(here("outputs", "csu60_7DA.png"),  #Saving output
        width = 5, height = 7)  #Specifying width and height
@@ -109,11 +109,11 @@ As expected, exogenous 7DA did rescue the constitutive dauer formation.
 Next, I will plot the data showing whether introducing a wild-type copy of the *Ppa-hsd-2* gene will also reduce the inappropriate dauer formation.
 
 ```{r}
-rescue_summary %>% 
-  filter(condition %in% c("csu60_none", "csuEx54_none")) %>% 
-  rescue_plot(x = condition, y = Values) +
-  labs(title = "Ppa-hsd-2 rescue vector inhibits \ncsu60 constitutive dauer formation") +
-  scale_x_discrete(name = " ", labels = c("csu60", "csu60 + Ppa-hsd-2"))
+rescue_summary %>%  #Start working with rescue_summary data frame
+  filter(condition %in% c("csu60_none", "csuEx54_none")) %>% #Filter to control or transgenic worms
+  rescue_plot(x = condition, y = Values) + #Start rescue_plot function with x mapped to condition and y mapped to Values
+  labs(title = "Ppa-hsd-2 rescue vector inhibits \ncsu60 constitutive dauer formation") + #Add plot title
+  scale_x_discrete(labels = c("csu60", "csu60 + Ppa-hsd-2")) #Change x-axis labels
 
 ggsave(here("outputs", "csu60_transgene.png"),  #Saving output
        width = 5, height = 7)  #Specifying width and height
