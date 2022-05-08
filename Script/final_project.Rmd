@@ -189,7 +189,7 @@ knitr::include_app(" https://h-carstensen.shinyapps.io/odr3_slider/",
 ```
 
 
-Click [here]() to view the code used to make this shiny app. 
+Click [here](https://github.com/Biol551-CSUN/Carstensen_final_project/blob/main/Script/odr3_slider_app/odr3_slider/app.R) to view the code used to make this shiny app. 
 
 
 In *C. elegans*, the *odr-3* gene is involved in response to volatile odors, so this extra expression in *csu60* may be related to the ZTDO chemotaxis phenotype. 
