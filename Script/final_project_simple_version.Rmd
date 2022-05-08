@@ -1,8 +1,7 @@
 ---
-title: "Biol551 Final Project - Pristionchus pacificus Ppa-hsd-2 constitutive dauer mutant and Ppa-odr-3 mutagenesis"
+title: "Biol551 Final Project (Rmd without Shiny App)"
 author: "Heather Carstensen"
-date: "5/6/2022"
-runtime: shiny
+date: "5/8/2022"
 output:
   prettydoc::html_pretty:
     toc: TRUE
@@ -24,7 +23,6 @@ library(htmlwidgets)
 library(webshot)
 library(magick)
 ```
-
 
 ## *Pristionchus pacificus* life cycle
 
@@ -49,7 +47,7 @@ To address whether deletion of *Ppa-hsd-2* is causing the *csu60* dauer phenotyp
  * A wild-type *Ppa-hsd-2* transgene
 can prevent the inappropriate dauer formation in *csu60*. 
 
-First, I will read in the related data and process it. 
+First, I will read in the related data and process it.
 
 ```{r}
 rescue_data <- read_csv(here("data", "rescue.csv")) #Read in the data
@@ -102,9 +100,6 @@ rescue_summary %>%
   rescue_plot(x = condition, y = Values) +
   labs(title = "Delta-7-dafachronic acid (7DA) rescues \ncsu60 constitutive dauer formation") +
   scale_x_discrete(name = " ", labels = c("csu60", "csu60 + 7DA"))
-
-ggsave(here("outputs", "csu60_7DA.png"),  #Saving output
-       width = 5, height = 7)  #Specifying width and height
 ```
 
 As expected, exogenous 7DA did rescue the constitutive dauer formation. 
@@ -117,9 +112,6 @@ rescue_summary %>%
   rescue_plot(x = condition, y = Values) +
   labs(title = "Ppa-hsd-2 rescue vector inhibits \ncsu60 constitutive dauer formation") +
   scale_x_discrete(name = " ", labels = c("csu60", "csu60 + Ppa-hsd-2"))
-
-ggsave(here("outputs", "csu60_transgene.png"),  #Saving output
-       width = 5, height = 7)  #Specifying width and height
 ```
 
 As expected, the *Ppa-hsd-2* gene also rescued the dauer formation, verifying that the *csu60* Daf-c phenotype is caused by deletion of the *Ppa-hsd-2* gene. 
@@ -175,9 +167,6 @@ chemotaxis_data %>%   #Start with chemotaxis data frame
                      n.breaks = 10) +  #Change number of y-axis major breaks to 10
   geom_hline(yintercept = 0) +  #Add a horizontal, y-intercept line at y = 0
   labs(title = "csu60 enhanced adult attraction to ZTDO requires \nPpa-hsd-2 but not delta-7-dafachronic acid (7DA)") #Add a plot title
-
-ggsave(here("outputs", "chemotaxis.png"),  #Save the plot
-       width = 7, height = 5)  #Specify the width and height
 ```
 
 The wild-type strain PS312 responses to ZTDO look as expected - mild attraction to ZTDO in the adult stage, and higher attraction in the dauer stage. Interestingly, the *csu60* mutant adults show elevated attraction to ZTDO that resembles dauer-like attraction.
@@ -186,15 +175,9 @@ The wild-type strain PS312 responses to ZTDO look as expected - mild attraction 
 
 Interestingly, we found that the *Ppa-hsd-2* mutant ectopically expresses a transgenic fluorescent reporter for the gene *Ppa-odr-3* in an extra pair of neurons, compared to just two pairs of neurons in wild type (PS312). 
 
-```{r echo=FALSE}
-knitr::include_app(" https://h-carstensen.shinyapps.io/odr3_slider/",
-  height = "600px") #Calling the shiny app from shinyapps.io
-
-```
-
+Click [here](https://h-carstensen.shinyapps.io/odr3_slider/) for shiny image slider showing *Ppa-odr-3* expression patterns.
 
 Click [here](https://github.com/Biol551-CSUN/Carstensen_final_project/blob/main/Script/odr3_slider_app/odr3_slider/app.R) to view the code used to make this shiny app. 
-
 
 In *C. elegans*, the *odr-3* gene is involved in response to volatile odors, so this extra expression in *csu60* may be related to the ZTDO chemotaxis phenotype. 
 
@@ -215,7 +198,6 @@ nodes <- data.frame(  #Start data frame called nodes
 odr3_data$IDsource <- match(odr3_data$source, nodes$name)-1  #Reformat source nodes
 odr3_data$IDtarget <- match(odr3_data$target, nodes$name)-1  #Reformat target nodes
 
-
 # Make the Network
 plot <- sankeyNetwork(Links = odr3_data, #Making a Sankey plot
                       Nodes = nodes,  #setting node values
@@ -229,7 +211,6 @@ plot <- sankeyNetwork(Links = odr3_data, #Making a Sankey plot
 saveWidget(plot, file=paste0( getwd(), "/HtmlWidget/sankey.html"))  #Saving the html widget
 
 webshot(here("HtmlWidget", "sankey.html"), "sankey.png")  #Taking a screenshot of the html widget and saving as a .png
-
 ```
 
 Several mutant alleles were generated using CRISPR-Cas9 mutagenesis. The next steps would be to generate a double mutant of *Ppa-hsd-2* and *Ppa-odr-3*, and then test *Ppa-odr-3* mutants and *Ppa-odr-3*;*Ppa-hsd-2* double mutants for ZTDO chemotaxis, to examine whether *Ppa-odr-3* changes the enhanced adult attraction to ZTDO. 
