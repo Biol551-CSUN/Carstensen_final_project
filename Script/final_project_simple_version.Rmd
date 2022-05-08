@@ -42,10 +42,7 @@ To understand what genes regulate the dauer stage, researchers often examine mut
 
 We learned from whole genome sequencing that a constitutive dauer allele, *csu60*, has a deletion that includes the gene *Ppa-hsd-2*. This gene is an enzyme that makes delta-7-dafachronic acid (7DA), a hormone that normally suppresses dauer formation. 
 
-To address whether deletion of *Ppa-hsd-2* is causing the *csu60* dauer phenotype, we examined whether:
- * Exposure to exogenous 7DA hormone
- * A wild-type *Ppa-hsd-2* transgene
-can prevent the inappropriate dauer formation in *csu60*. 
+To address whether deletion of *Ppa-hsd-2* is causing the *csu60* dauer phenotype, we examined whether exposure to exogenous 7DA hormone or introducing a wild-type *Ppa-hsd-2* transgene can prevent the inappropriate dauer formation in *csu60*. 
 
 First, I will read in the related data and process it.
 
