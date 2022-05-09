@@ -26,7 +26,7 @@ library(magick)
 
 ## *Pristionchus pacificus* life cycle
 
-*Pristionchus pacificus* is a free-living, microscopic nematode (roundworm) that also associates with a specific species of beetle, *Exomala orientalis*.
+*Pristionchus pacificus* is a free-living, microscopic nematode (roundworm) that associates with a species of beetle, *Exomala orientalis*.
 
 When environmental conditions are favorable, *P. pacificus* continuously develop through the embryonic stage and four larval stages before reaching reproductive adulthood, a process that takes about three days.
 
@@ -40,14 +40,23 @@ image_read(here("Images", "lifecycle.png"))  #Read in life cycle image
 
 To understand what genes regulate the dauer stage, researchers often examine mutants that exhibit dauer-related phenotypes. One such phenotype is constitutive dauer formation, Daf-c, wherein the mutant worms inappropriately enter the dauer stage even with sufficient food. 
 
-We learned from whole genome sequencing that a constitutive dauer allele, *csu60*, has a deletion that includes the gene *Ppa-hsd-2*. This gene is an enzyme that makes delta-7-dafachronic acid (7DA), a hormone that normally suppresses dauer formation. 
+We learned from whole genome sequencing that a constitutive dauer allele, *csu60*, has a deletion that includes the gene *Ppa-hsd-2*. 
 
-To address whether deletion of *Ppa-hsd-2* is causing the *csu60* dauer phenotype, we examined whether exposure to exogenous 7DA hormone or introducing a wild-type *Ppa-hsd-2* transgene can prevent the inappropriate dauer formation in *csu60*. 
+*Ppa-hsd-2* is an enzyme that makes delta-7-dafachronic acid (7DA), a hormone that normally suppresses dauer formation. 
+
+To address whether deletion of *Ppa-hsd-2* is causing the *csu60* dauer phenotype, we examined whether
+
+ * feeding them 7DA
+ * transgenically introducing a wild-type copy of *Ppa-hsd-2*
+ 
+will prevent the inappropriate dauer formation in *csu60*. 
 
 First, I will read in the related data and process it.
 
 ```{r}
 rescue_data <- read_csv(here("data", "rescue.csv")) #Read in the data
+
+head(rescue_data)
 
 #### Formatting rescue data to calculate dauer and non-dauer population percentages.
 
@@ -68,6 +77,8 @@ rescue_summary <- rescue_data %>%   #Making a new summary data frame
   mutate(condition = factor(condition,   #Changing the factors of the condition column
                             levels = c("csu60_none", "csuEx54_none", 
                                        "csu60_EtOH", "csu60_7DA")))  #Designating the order of the levels for the condition column
+
+head(rescue_summary)
 
 color_palette <- c("#97D2ED", "#215382")  #Creating a custom color palette
 
@@ -128,6 +139,8 @@ A chemotaxis index near 1 means high attraction, an index near -1 means high rep
 ```{r}
 chemotaxis_data <- read_csv(here("data", "chemotaxis.csv"))  #Read in chemotaxis data
 
+head(chemotaxis_data)
+
 #### Analyze and prepare data for plotting
 
 chemotaxis_data <- chemotaxis_data %>%  #Overwrite changes to data frame
@@ -141,6 +154,8 @@ chemotaxis_data <- chemotaxis_data %>%  #Overwrite changes to data frame
                                        'adult_csu60_no_7DA', 'adult_csu60_7DA',
                                        'adult_csu60_no_transgene', 'adult_csu60_transgene')))  %>%  #Designating these factor levels
   group_by(condition)  #Grouping by condition
+
+head(chemotaxis_data)
 
 color_palette2 <- c("#AFCBFF", "#FAEEC0")  #Making a custom color palette
 
@@ -185,6 +200,8 @@ To determine whether the *csu60* ectopic *Ppa-odr-3* expression is related to th
 ```{r}
 odr3_data <- read_csv(here("data", "odr3_data.csv"))  #Read in data
 
+head(odr3_data)
+
 #Need to create a data frame with all the nodes that will be used in the Sankey plot.
 nodes <- data.frame(  #Start data frame called nodes
   name=c(as.character(odr3_data$source),  #take source node names from odr3_data
@@ -205,6 +222,8 @@ plot <- sankeyNetwork(Links = odr3_data, #Making a Sankey plot
                    sinksRight=FALSE,  #Making it so that nodes are not on the right border of the plot
                    fontSize = 12)  #Increasing the font size
 
+plot
+
 saveWidget(plot, file=paste0( getwd(), "/HtmlWidget/sankey.html"))  #Saving the html widget
 
 webshot(here("HtmlWidget", "sankey.html"), "sankey.png")  #Taking a screenshot of the html widget and saving as a .png
@@ -212,6 +231,7 @@ webshot(here("HtmlWidget", "sankey.html"), "sankey.png")  #Taking a screenshot o
 
 Several mutant alleles were generated using CRISPR-Cas9 mutagenesis. The next steps would be to generate a double mutant of *Ppa-hsd-2* and *Ppa-odr-3*, and then test *Ppa-odr-3* mutants and *Ppa-odr-3*;*Ppa-hsd-2* double mutants for ZTDO chemotaxis, to examine whether *Ppa-odr-3* changes the enhanced adult attraction to ZTDO. 
 
-
+Reference:
+Carstensen HR, Villalon RM, Banerjee N, Hallem EA, Hong RL. 2021. Steroid hormone pathways coordinate developmental diapause and olfactory remodeling in *Pristionchus pacificus*. Genetics. 218:iyab071.
 
 

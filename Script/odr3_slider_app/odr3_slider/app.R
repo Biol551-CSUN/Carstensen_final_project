@@ -12,9 +12,9 @@ library(shiny)
 ### Create the user interface, using the default settings and files
 # provided in the shiny.slider repository on Github
 
-ui <- fluidPage(
+ui <- fluidPage(   #Add elements to the app UI
   
-  tags$script(src = "jquery-1.6.1.min.js"),
+  tags$script(src = "jquery-1.6.1.min.js"),   #Call the javascript files made by the app creator
   tags$script(src = "jquery-ui-1.8.13.custom.min.js"),
   tags$script(src = "jquery.beforeafter-1.4.min.js"),
   
@@ -35,14 +35,14 @@ ui <- fluidPage(
       id = "slider",
       img(
         src = "img/odr3_wt.jpeg",   #Replace the default image with my image
-        width = 800, 
-        height = 533
+        width = 800,    #Image width
+        height = 533    #Image height
       ),
       
       img(
         src = "img/odr3_mut.jpeg",   #Replace the default image with my image
-        width = 800, 
-        height = 533
+        width = 800,    #Image width
+        height = 533   #Image height
       )
     )
   )
