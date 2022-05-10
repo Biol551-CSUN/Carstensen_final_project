@@ -20,7 +20,7 @@ Here are the folders and files associated with this project:
    * [csu60_transgene](https://github.com/Biol551-CSUN/Carstensen_final_project/blob/main/outputs/csu60_transgene.png)
    * [chemotaxis](https://github.com/Biol551-CSUN/Carstensen_final_project/blob/main/outputs/chemotaxis.png)
    * [sankey](https://github.com/Biol551-CSUN/Carstensen_final_project/blob/main/outputs/sankey.png)
- * [Images]() includes pictures that I included to help explain background information:
+ * [Images](https://github.com/Biol551-CSUN/Carstensen_final_project/tree/main/Images) includes pictures that I included to help explain background information:
     * [lifecycle](https://github.com/Biol551-CSUN/Carstensen_final_project/blob/main/Images/lifecycle.png) shows the *Pristionchus pacificus* life cycle
     * [ctx_template](https://github.com/Biol551-CSUN/Carstensen_final_project/blob/main/Images/ctx_template.png) shows the setup for chemotaxis experiments. 
  * [HtmlWidget](https://github.com/Biol551-CSUN/Carstensen_final_project/tree/main/HtmlWidget) includes files necessary for the sankey diagram produced using the networkD3 package. 
